@@ -1,18 +1,36 @@
 from extensions import db
 
-schedule_list = []
-
-
-def get_by_id():
-    if schedule_list:
-        last_id = schedule_list[-1]
-    else:
-        return 1
-
-    return last_id.id + 1
-
-
 class Schedule(db.Model):
+
+    def data(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'weight': self.weight,
+            'height': self.height,
+            'description': self.description,
+            'lunch': self.lunch,
+            'dinner': self.lunch,
+            'dessert = self.dessert'
+            'user_id': self.user_id
+        }
+
+    @classmethod
+    def get_all_published(cls):
+        return cls.query.filter_by(is_publish=True).all()
+
+    @classmethod
+    def get_by_id(cls, recipe_id):
+        return cls.query.filter_by(id=recipe_id).first()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     __tableName__ = 'diet plan'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
