@@ -1,12 +1,16 @@
 from flask import request
 from flask_restful import Resource
 from http import HTTPStatus
+
 from models.schedule import Schedule, schedule_list
 
 
 class ScheduleListResource(Resource):
+
     def get(self):
+
         data = []
+
         for schedule in schedule_list:
             if schedule.is_publish is True:
                 data.append(schedule.data)
@@ -29,7 +33,7 @@ class ScheduleListResource(Resource):
 
 class ScheduleResource(Resource):
     def get(self, schedule_id):
-        schedule = next(schedule for schedule in schedule_list if schedule.id == schedule_id and schedule.is_publish == True)
+        schedule = next((schedule for schedule in schedule_list if schedule.id == schedule_id and schedule.is_publish == True), None)
 
         if schedule is None:
             return {'message': 'schedule not found'}, HTTPStatus.NOT_FOUND
@@ -54,8 +58,18 @@ class ScheduleResource(Resource):
 
         return schedule.data.HTTPStatus.OK
 
+    def delete(self, schedule_id):
+        schedule = next((schedule for schedule in schedule_list if schedule.id == schedule_id), None)
 
-class ScheduleResourceResource(Resource):
+        if schedule is None:
+            return {'message': 'schedule not found'}, HTTPStatus.NOT_FOUND
+
+        schedule_list.remove(schedule)
+
+        return {}, HTTPStatus.NO_CONTENT
+
+
+class SchedulePublishResource(Resource):
     def put(self, schedule_id):
         schedule = next((schedule for schedule in schedule_list if schedule.id == schedule_id), None)
 
@@ -68,10 +82,8 @@ class ScheduleResourceResource(Resource):
 
     def delete(self, schedule_id):
         schedule = next((schedule for schedule in schedule_list if schedule.id == schedule_id), None)
-
         if schedule is None:
             return {'message': 'schedule not found'}, HTTPStatus.NOT_FOUND
-
         schedule.is_publish = False
 
         return {}, HTTPStatus.NO_CONTENT
